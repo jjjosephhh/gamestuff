@@ -86,6 +86,12 @@ func main() {
 
 		rl.EndDrawing()
 
+		if rl.IsKeyPressed(rl.KeyQ) {
+			if cardSelected != nil {
+				cardSelected = nil
+			}
+		}
+
 		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 			for _, c := range cards {
 				if c.MousedOver(&posMouse) {
