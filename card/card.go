@@ -113,14 +113,18 @@ func (c *Card) DrawTargetPath(posMouse *rl.Vector2, textureCrosshair *rl.Texture
 	// Normalize the direction vector
 	direction = rl.Vector2Normalize(direction)
 	// Loop to calculate and store the intermediate vectors
+	var prevVector *rl.Vector2
 	for i := float32(0); i <= distance; i += 20 {
 		intermediateVector := rl.Vector2Add(cardCenter, rl.Vector2Scale(direction, i))
-		rl.DrawCircle(
-			int32(intermediateVector.X),
-			int32(intermediateVector.Y),
-			5,
-			rl.White,
-		)
+		if prevVector != nil && int(i/20)%2 == 0 {
+			rl.DrawLineEx(
+				*prevVector,
+				intermediateVector,
+				7,
+				rl.Pink,
+			)
+		}
+		prevVector = &intermediateVector
 	}
 	rl.DrawTexture(
 		*textureCrosshair,
