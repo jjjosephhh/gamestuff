@@ -1,4 +1,4 @@
-module github.com/jjjosephhh/blackpinkmatch
+module github.com/jjjosephhh/gamestuff
 
 go 1.19
 

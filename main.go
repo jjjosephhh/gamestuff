@@ -2,7 +2,7 @@ package main
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/jjjosephhh/blackpinkmatch/card"
+	"github.com/jjjosephhh/gamestuff/card"
 )
 
 const screenWidth int32 = 1000

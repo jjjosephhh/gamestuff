@@ -4,7 +4,7 @@ import (
 	"math"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/jjjosephhh/blackpinkmatch/util"
+	"github.com/jjjosephhh/gamestuff/util"
 )
 
 type Card struct {
