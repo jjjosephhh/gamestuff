@@ -1,10 +1,19 @@
 package card
 
 import (
+	"image/color"
 	"math"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/jjjosephhh/gamestuff/util"
+)
+
+type Relationship int
+
+const (
+	Friendly Relationship = iota
+	Enemy
+	Neutral
 )
 
 type Card struct {
@@ -16,11 +25,13 @@ type Card struct {
 	RotFlip       float32
 	RotFlipTarget float32
 	SpeedFlip     float32
+	Relation      Relationship // the relation to the current selected card
 }
 
 func NewCard(
 	pathFront, pathBack string,
 	position *rl.Vector2,
+	relation Relationship,
 ) *Card {
 	textureFront := rl.LoadTexture(pathFront)
 	textureBack := rl.LoadTexture(pathBack)
@@ -33,6 +44,7 @@ func NewCard(
 		RotFlip:       0,
 		RotFlipTarget: 0,
 		SpeedFlip:     1000,
+		Relation:      relation,
 	}
 }
 func (c *Card) Unload() {
@@ -86,7 +98,7 @@ func (c *Card) Draw() {
 	}
 }
 
-func (c *Card) Clicked(posMouse *rl.Vector2) bool {
+func (c *Card) MousedOver(posMouse *rl.Vector2) bool {
 	if util.Between(posMouse.X, c.Pos.X, c.Pos.X+float32(c.Width)) && util.Between(posMouse.Y, c.Pos.Y, c.Pos.Y+float32(c.Height)) {
 		return true
 	}
@@ -101,7 +113,11 @@ func (c *Card) Flip() {
 	}
 }
 
-func (c *Card) DrawTargetPath(posMouse *rl.Vector2, textureCrosshair *rl.Texture2D) {
+func (c *Card) DrawTargetPath(
+	posMouse *rl.Vector2,
+	textureCrosshair *rl.Texture2D,
+	cardHovered *Card,
+) {
 	cardCenter := rl.NewVector2(
 		c.Pos.X+float32(c.Width)/2,
 		c.Pos.Y+float32(c.Height)/2,
@@ -114,6 +130,19 @@ func (c *Card) DrawTargetPath(posMouse *rl.Vector2, textureCrosshair *rl.Texture
 	direction = rl.Vector2Normalize(direction)
 	// Loop to calculate and store the intermediate vectors
 	var prevVector *rl.Vector2
+	var lineColor color.RGBA
+
+	switch {
+	case cardHovered == nil:
+		lineColor = rl.Gray
+	case cardHovered.Relation == Friendly:
+		lineColor = rl.SkyBlue
+	case cardHovered.Relation == Enemy:
+		lineColor = rl.Red
+	default:
+		lineColor = rl.Gray
+	}
+
 	for i := float32(0); i <= distance; i += 20 {
 		intermediateVector := rl.Vector2Add(cardCenter, rl.Vector2Scale(direction, i))
 		if prevVector != nil && int(i/20)%2 == 0 {
@@ -121,7 +150,7 @@ func (c *Card) DrawTargetPath(posMouse *rl.Vector2, textureCrosshair *rl.Texture
 				*prevVector,
 				intermediateVector,
 				7,
-				rl.Pink,
+				lineColor,
 			)
 		}
 		prevVector = &intermediateVector
@@ -130,6 +159,6 @@ func (c *Card) DrawTargetPath(posMouse *rl.Vector2, textureCrosshair *rl.Texture
 		*textureCrosshair,
 		int32(posMouse.X)-textureCrosshair.Width/2,
 		int32(posMouse.Y)-textureCrosshair.Height/2,
-		rl.White,
+		lineColor,
 	)
 }

@@ -7,7 +7,6 @@
 
 ## To Do
 
-* target should change color when hovering over friendly, enemy, neutral
 * implement a cancellation button for the target
 
 ## Doing
@@ -15,3 +14,4 @@
 ## Done
 
 * change target lines to slim rectangles
+* target should change color when hovering over friendly, enemy, neutral

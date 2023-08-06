@@ -33,21 +33,26 @@ func main() {
 		1.0, // Zoom level (normal zoom initially)
 	)
 
-	posFemale := rl.NewVector2(float32(screenWidth)/4, float32(screenHeight)/2)
-	posMale := rl.NewVector2(3*float32(screenWidth)/4, float32(screenHeight)/2)
+	posFriendly := rl.NewVector2(float32(screenWidth)/4, float32(screenHeight)/2)
+	posEnemy := rl.NewVector2(3*float32(screenWidth)/4, 20)
 
-	cardFemale := card.NewCard(
+	cardFriendly := card.NewCard(
 		"assets/images/free-npc-quest-tcg-cards-pixel-art/PNG/Cards_color1/Civilian_card_version1/Civilian_card_version1_pic1.png",
 		"assets/images/free-npc-quest-tcg-cards-pixel-art/PNG/Cards_color1/Civilian_card_back/Civilian_card_back.png",
-		&posFemale,
+		&posFriendly,
+		card.Friendly,
 	)
-	defer cardFemale.Unload()
-	cardMale := card.NewCard(
+	defer cardFriendly.Unload()
+	cardEnemy := card.NewCard(
 		"assets/images/free-npc-quest-tcg-cards-pixel-art/PNG/Cards_color1/Civilian_card_version1/Civilian_card_version1_pic2.png",
 		"assets/images/free-npc-quest-tcg-cards-pixel-art/PNG/Cards_color1/Civilian_card_back/Civilian_card_back.png",
-		&posMale,
+		&posEnemy,
+		card.Enemy,
 	)
-	defer cardMale.Unload()
+	defer cardEnemy.Unload()
+
+	cards := make([]*card.Card, 0)
+	cards = append(cards, cardFriendly, cardEnemy)
 
 	var cardSelected *card.Card
 
@@ -62,13 +67,17 @@ func main() {
 
 		rl.DrawRectangle(0, 0, screenWidth, screenHeight, rl.Beige)
 
-		cardFemale.Draw()
-		cardMale.Draw()
-
-		if cardFemale == cardSelected {
-			cardFemale.DrawTargetPath(&posMouse, &crosshair177)
-		} else if cardMale == cardSelected {
-			cardMale.DrawTargetPath(&posMouse, &crosshair177)
+		var cardHovered *card.Card
+		for _, c := range cards {
+			c.Draw()
+			if c.MousedOver(&posMouse) {
+				cardHovered = c
+			}
+		}
+		for _, c := range cards {
+			if c == cardSelected {
+				c.DrawTargetPath(&posMouse, &crosshair177, cardHovered)
+			}
 		}
 
 		rl.EndMode2D()
@@ -78,32 +87,15 @@ func main() {
 		rl.EndDrawing()
 
 		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-			if cardFemale.Clicked(&posMouse) {
-				if cardSelected == cardFemale {
-					cardSelected = nil
-				} else {
-					cardSelected = cardFemale
+			for _, c := range cards {
+				if c.MousedOver(&posMouse) {
+					if cardSelected == c {
+						cardSelected = nil
+					} else {
+						cardSelected = c
+					}
+					cardFriendly.Flip()
 				}
-				cardFemale.Flip()
-				// if songPinkVenom.IsPlaying() {
-				// 	songPinkVenom.Stop()
-				// } else {
-				// 	songPinkVenom.PlayRandom(playTime)
-				// }
-			}
-
-			if cardMale.Clicked(&posMouse) {
-				if cardSelected == cardMale {
-					cardSelected = nil
-				} else {
-					cardSelected = cardMale
-				}
-				cardMale.Flip()
-				// if songShutDown.IsPlaying() {
-				// 	songShutDown.Stop()
-				// } else {
-				// 	songShutDown.PlayRandom(playTime)
-				// }
 			}
 		}
 
