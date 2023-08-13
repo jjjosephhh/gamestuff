@@ -5,6 +5,7 @@ import (
 	"math"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/jjjosephhh/gamestuff/constants"
 	"github.com/jjjosephhh/gamestuff/util"
 )
 
@@ -20,6 +21,7 @@ type Card struct {
 	TextureFront  *rl.Texture2D
 	TextureBack   *rl.Texture2D
 	Pos           *rl.Vector2
+	PosTarget     *rl.Vector2
 	Width         int32
 	Height        int32
 	RotFlip       float32
@@ -31,6 +33,7 @@ type Card struct {
 func NewCard(
 	pathFront, pathBack string,
 	position *rl.Vector2,
+	positionTarget *rl.Vector2,
 	relation Relationship,
 ) *Card {
 	textureFront := rl.LoadTexture(pathFront)
@@ -39,6 +42,7 @@ func NewCard(
 		TextureFront:  &textureFront,
 		TextureBack:   &textureBack,
 		Pos:           position,
+		PosTarget:     positionTarget,
 		Width:         textureFront.Width,
 		Height:        textureFront.Height,
 		RotFlip:       0,
@@ -53,6 +57,7 @@ func (c *Card) Unload() {
 }
 
 func (c *Card) Draw() {
+	c.Move()
 	dt := rl.GetFrameTime()
 	if math.Abs(float64(c.RotFlipTarget)-float64(c.RotFlip)) < float64(c.SpeedFlip*dt) {
 		c.RotFlip = c.RotFlipTarget
@@ -161,4 +166,39 @@ func (c *Card) DrawTargetPath(
 		int32(posMouse.Y)-textureCrosshair.Height/2,
 		lineColor,
 	)
+}
+
+func (c *Card) InMotion() bool {
+	return c.Pos.X != c.PosTarget.X || c.Pos.Y != c.PosTarget.Y
+}
+
+func (c *Card) Clicked(mousePosition *rl.Vector2) bool {
+	width := c.TextureFront.Width
+	height := c.TextureFront.Height
+	return c.Pos.X <= mousePosition.X &&
+		mousePosition.X <= c.Pos.X+float32(width) &&
+		c.Pos.Y <= mousePosition.Y &&
+		mousePosition.Y <= c.Pos.Y+float32(height)
+}
+
+func (c *Card) SetCardHandY() {
+	c.PosTarget.Y = float32(constants.ScreenHeight) - float32(c.Height) + 50
+}
+
+func (c *Card) Move() bool {
+	if !c.InMotion() {
+		return false
+	}
+	direction := rl.Vector2Subtract(*c.PosTarget, *c.Pos)
+	direction = rl.Vector2Normalize(direction)
+	amount := rl.NewVector2(direction.X*constants.SpeedCard, direction.Y*constants.SpeedCard)
+	newPosition := rl.Vector2Add(*c.Pos, amount)
+	c.Pos.X = newPosition.X
+	c.Pos.Y = newPosition.Y
+	distance := rl.Vector2Distance(*c.Pos, *c.PosTarget)
+	if distance <= constants.SpeedCard {
+		c.Pos.X = c.PosTarget.X
+		c.Pos.Y = c.PosTarget.Y
+	}
+	return true
 }

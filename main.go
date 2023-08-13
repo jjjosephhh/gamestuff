@@ -65,30 +65,6 @@ func main() {
 		posMouse := rl.GetMousePosition()
 		// rl.UpdateMusicStream(*songPinkVenom.Music)
 		// rl.UpdateMusicStream(*songShutDown.Music)
-		rl.BeginDrawing()
-		rl.ClearBackground(rl.RayWhite)
-
-		rl.BeginMode2D(camera)
-
-		rl.DrawRectangle(0, 0, constants.ScreenWidth, constants.ScreenHeight, rl.Beige)
-
-		// var cardHovered *card.Card
-		hand.Reposition()
-		hand.Draw()
-
-		// for _, c := range cards {
-		// 	if c == cardSelected {
-		// 		c.DrawTargetPath(&posMouse, &crosshair177, cardHovered)
-		// 	}
-		// }
-
-		rl.EndMode2D()
-
-		btnClicked = rgui.Button(rl.NewRectangle(float32(constants.ScreenWidth/2-40), float32(constants.ScreenHeight/2-20), 80, 40), "Click Me!")
-
-		rl.DrawFPS(10, 10)
-
-		rl.EndDrawing()
 
 		if rl.IsKeyPressed(rl.KeyQ) {
 			if cardSelected != nil {
@@ -115,5 +91,30 @@ func main() {
 			btnClicked = false
 			hand.Append()
 		}
+
+		rl.BeginDrawing()
+		rl.ClearBackground(rl.RayWhite)
+
+		rl.BeginMode2D(camera)
+
+		rl.DrawRectangle(0, 0, constants.ScreenWidth, constants.ScreenHeight, rl.Beige)
+
+		// var cardHovered *card.Card
+		hand.Draw()
+
+		// for _, c := range cards {
+		// 	if c == cardSelected {
+		// 		c.DrawTargetPath(&posMouse, &crosshair177, cardHovered)
+		// 	}
+		// }
+
+		rl.EndMode2D()
+
+		btnClicked = rgui.Button(rl.NewRectangle(float32(constants.ScreenWidth/2-40), float32(constants.ScreenHeight/2-20), 80, 40), "Click Me!")
+
+		rl.DrawFPS(10, 10)
+
+		rl.EndDrawing()
+
 	}
 }
