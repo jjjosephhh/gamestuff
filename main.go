@@ -99,7 +99,7 @@ func main() {
 
 		rl.DrawRectangle(0, 0, constants.ScreenWidth, constants.ScreenHeight, rl.Beige)
 
-		// var cardHovered *card.Card
+		hand.MousedOver(&posMouse)
 		hand.Draw()
 
 		// for _, c := range cards {

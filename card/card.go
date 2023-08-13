@@ -9,12 +9,19 @@ import (
 	"github.com/jjjosephhh/gamestuff/util"
 )
 
-type Relationship int
+type RelationshipWithPlayer int
 
 const (
-	Friendly Relationship = iota
+	Friendly RelationshipWithPlayer = iota
 	Enemy
 	Neutral
+)
+
+type RelationshipWithMouse int
+
+const (
+	NotHovered RelationshipWithMouse = iota
+	Hovered
 )
 
 type Card struct {
@@ -27,14 +34,14 @@ type Card struct {
 	RotFlip       float32
 	RotFlipTarget float32
 	SpeedFlip     float32
-	Relation      Relationship // the relation to the current selected card
+	Relation      RelationshipWithPlayer // the relation to the current selected card
 }
 
 func NewCard(
 	pathFront, pathBack string,
 	position *rl.Vector2,
 	positionTarget *rl.Vector2,
-	relation Relationship,
+	relation RelationshipWithPlayer,
 ) *Card {
 	textureFront := rl.LoadTexture(pathFront)
 	textureBack := rl.LoadTexture(pathBack)
@@ -172,31 +179,27 @@ func (c *Card) InMotion() bool {
 	return c.Pos.X != c.PosTarget.X || c.Pos.Y != c.PosTarget.Y
 }
 
-func (c *Card) Clicked(mousePosition *rl.Vector2) bool {
-	width := c.TextureFront.Width
-	height := c.TextureFront.Height
-	return c.Pos.X <= mousePosition.X &&
-		mousePosition.X <= c.Pos.X+float32(width) &&
-		c.Pos.Y <= mousePosition.Y &&
-		mousePosition.Y <= c.Pos.Y+float32(height)
-}
-
 func (c *Card) SetCardHandY() {
 	c.PosTarget.Y = float32(constants.ScreenHeight) - float32(c.Height) + 50
+}
+func (c *Card) SetCardHandHoveredY() {
+	c.PosTarget.Y = float32(constants.ScreenHeight) - float32(c.Height)
 }
 
 func (c *Card) Move() bool {
 	if !c.InMotion() {
 		return false
 	}
+	dt := rl.GetFrameTime()
 	direction := rl.Vector2Subtract(*c.PosTarget, *c.Pos)
 	direction = rl.Vector2Normalize(direction)
-	amount := rl.NewVector2(direction.X*constants.SpeedCard, direction.Y*constants.SpeedCard)
+	adjustedSpeed := constants.SpeedCard * dt
+	amount := rl.NewVector2(direction.X*adjustedSpeed, direction.Y*adjustedSpeed)
 	newPosition := rl.Vector2Add(*c.Pos, amount)
 	c.Pos.X = newPosition.X
 	c.Pos.Y = newPosition.Y
 	distance := rl.Vector2Distance(*c.Pos, *c.PosTarget)
-	if distance <= constants.SpeedCard {
+	if distance <= adjustedSpeed {
 		c.Pos.X = c.PosTarget.X
 		c.Pos.Y = c.PosTarget.Y
 	}

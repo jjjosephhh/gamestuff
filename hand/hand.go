@@ -82,9 +82,19 @@ func (hand *Hand) Draw() {
 	for _, c := range hand.Cards {
 		c.Move()
 		c.Draw()
-		// if c.MousedOver(&posMouse) {
-		// 	cardHovered = c
-		// }
+	}
+}
+
+func (hand *Hand) MousedOver(posMouse *rl.Vector2) {
+	var mousedOver *card.Card
+	for i := len(hand.Cards) - 1; i >= 0; i-- {
+		c := hand.Cards[i]
+		if mousedOver == nil && c.MousedOver(posMouse) {
+			mousedOver = c
+			c.SetCardHandHoveredY()
+		} else {
+			c.SetCardHandY()
+		}
 	}
 }
 
